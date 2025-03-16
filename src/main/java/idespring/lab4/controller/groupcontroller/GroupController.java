@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/groups")
 public class GroupController {
     private final GroupService groupService;
+    private static final String STUDIDERR = "studentIds";
 
     @Autowired
     public GroupController(GroupService groupService) {
@@ -31,13 +32,13 @@ public class GroupController {
             throw new ValidationException("Поле 'name' обязательно и не может быть пустым");
         }
 
-        if (!request.containsKey("studentIds") || !(request.get("studentIds") instanceof List)) {
+        if (!request.containsKey(STUDIDERR) || !(request.get(STUDIDERR) instanceof List)) {
             throw new ValidationException(
                     "Поле 'studentIds' обязательно и должно быть списком чисел");
         }
 
         String name = (String) request.get("name");
-        List<Integer> studentIds = (List<Integer>) request.get("studentIds");
+        List<Integer> studentIds = (List<Integer>) request.get(STUDIDERR);
 
         Group group = groupService.addGroup(name, studentIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(group);
