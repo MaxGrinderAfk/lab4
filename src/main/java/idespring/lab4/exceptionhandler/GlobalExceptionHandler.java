@@ -1,6 +1,7 @@
 package idespring.lab4.exceptionhandler;
 
 import idespring.lab4.exceptions.EntityNotFoundException;
+import idespring.lab4.exceptions.SubjectNotAssignedException;
 import idespring.lab4.exceptions.ValidationException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
@@ -17,13 +18,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String ERRMSG = "error";
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
         Map<String, String> response = new HashMap<>();
-        response.put(ERRMSG, ex.getMessage());
+        response.put("error", ex.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>>
         handleEntityNotFoundException(EntityNotFoundException ex) {
         Map<String, String> response = new HashMap<>();
-        response.put(ERRMSG, ex.getMessage());
+        response.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
@@ -60,16 +60,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>>
         handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         Map<String, String> response = new HashMap<>();
-        response.put(ERRMSG, "Некорректный формат параметра: " + ex.getName());
+        response.put("error", "Некорректный формат параметра: " + ex.getName());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
         Map<String, String> response = new HashMap<>();
-        response.put(ERRMSG, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -77,8 +77,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>>
         handleMissingParams(MissingServletRequestParameterException ex) {
         Map<String, String> response = new HashMap<>();
-        response.put(ERRMSG, "Отсутствует обязательный параметр: " + ex.getParameterName());
+        response.put("error", "Отсутствует обязательный параметр: " + ex.getParameterName());
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(SubjectNotAssignedException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>>
+        handleSubjectNotAssignedException(SubjectNotAssignedException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Внутренняя ошибка сервера: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }
 
