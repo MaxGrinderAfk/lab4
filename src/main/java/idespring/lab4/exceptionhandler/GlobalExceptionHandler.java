@@ -28,7 +28,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>>
         handleEntityNotFoundException(EntityNotFoundException ex) {
         Map<String, String> response = new HashMap<>();

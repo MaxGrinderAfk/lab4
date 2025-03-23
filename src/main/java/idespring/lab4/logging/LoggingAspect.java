@@ -24,6 +24,7 @@ public class LoggingAspect {
             return result;
         } catch (Exception e) {
             logger.error("Error in method: {}", methodName, e);
+            throw e;
         }
     }
 }

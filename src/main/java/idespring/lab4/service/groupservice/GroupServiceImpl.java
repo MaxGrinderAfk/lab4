@@ -140,6 +140,18 @@ public class GroupServiceImpl implements GroupService {
                         EntityNotFoundException("Студенты с ID " + nonExistentIds + " не найдены");
             }
 
+            List<Student> studentsWithGroup = students.stream()
+                    .filter(student -> student.getGroup() != null)
+                    .toList();
+
+            if (!studentsWithGroup.isEmpty()) {
+                List<Long> studentsWithGroupIds = studentsWithGroup.stream()
+                        .map(Student::getId)
+                        .toList();
+                throw new IllegalStateException("Студенты с ID " + studentsWithGroupIds
+                        + " уже прикреплены к группе");
+            }
+
             for (Student student : students) {
                 student.setGroup(group);
             }
